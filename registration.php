@@ -7,7 +7,7 @@
      * @link https://github.com/Thomas-Athanasiou
      * @copyright Copyright (c) 2022 Hippiemonkeys Web Inteligence EE All Rights Reserved.
      * @license http://www.gnu.org/licenses/ GNU General Public License, version 3
-     * @package Hippiemonkeys_Directory
+     * @package Hippiemonkeys_MagentoDirectory
      */
 
     declare(strict_types=1);
@@ -16,7 +16,7 @@
 
     ComponentRegistrar::register(
         ComponentRegistrar::MODULE,
-        'Hippiemonkeys_Directory',
+        'Hippiemonkeys_ModificationMagentoDirectory',
         __DIR__
     );
 ?>

@@ -7,10 +7,10 @@
      * @link https://github.com/Thomas-Athanasiou
      * @copyright Copyright (c) 2022 Hippiemonkeys Web Inteligence EE All Rights Reserved.
      * @license http://www.gnu.org/licenses/ GNU General Public License, version 3
-     * @package Hippiemonkeys_Directory
+     * @package Hippiemonkeys_ModificationMagentoDirectory
      */
 
-    namespace Hippiemonkeys\Directory\Model;
+    namespace Hippiemonkeys\ModificationMagentoDirectory\Model;
 
     use Magento\Framework\App\ObjectManager,
         Magento\Framework\Exception\InputException,
@@ -33,7 +33,8 @@
         Magento\Framework\Model\ResourceModel\AbstractResource,
         Magento\Framework\Data\Collection\AbstractDb,
         Magento\Directory\Model\Currency\FilterFactory,
-        Magento\Framework\Locale\CurrencyInterface;
+        Magento\Framework\Locale\CurrencyInterface,
+        Hippiemonkeys\Core\Api\Helper\ConfigInterface;
 
     /**
      * Currency model
@@ -46,6 +47,8 @@
     class Currency
     extends ParentCurrency
     {
+        protected const CONFIG_PATH_MODIFICATION_STATUS = 'currency_status';
+
         /**
          * Number Formatter property
          *
@@ -72,6 +75,7 @@
          * @param \Magento\Directory\Helper\Data $directoryHelper
          * @param \Magento\Directory\Model\Currency\FilterFactory $currencyFilterFactory
          * @param \Magento\Framework\Locale\CurrencyInterface $localeCurrency
+         * @param \Hippiemonkeys\Core\Api\Helper\ConfigInterface $config
          * @param \Magento\Framework\Model\ResourceModel\AbstractResource|null $resource
          * @param \Magento\Framework\Data\Collection\AbstractDb|null $resourceCollection
          * @param array $data
@@ -90,6 +94,7 @@
             FilterFactory $currencyFilterFactory,
             CurrencyInterface $localeCurrency,
             DataObjectFactory $dataObjectFactory,
+            ConfigInterface $config,
             AbstractResource $resource = null,
             AbstractDb $resourceCollection = null,
             array $data = [],
@@ -119,6 +124,7 @@
             $this->_localeResolver = $localeResolver ?: ObjectManager::getInstance()->get(LocaleResolverInterface::class);
             $this->_numberFormatterFactory = $numberFormatterFactory ?: ObjectManager::getInstance()->get(NumberFormatterFactory::class);
             $this->_serializer = $serializer ?: ObjectManager::getInstance()->get(Serializer::class);
+            $this->_config = $config;
         }
 
         /**
@@ -126,22 +132,29 @@
          */
         public function convert($price, $toCurrency = null)
         {
-            if ($toCurrency === null)
+            if($this->getIsActive())
             {
-                return $price;
-            }
-            elseif ($rate = $this->getRate($toCurrency))
-            {
-                return (float)$price * (float)$rate;
-            }
+                if ($toCurrency === null)
+                {
+                    return $price;
+                }
+                elseif ($rate = $this->getRate($toCurrency))
+                {
+                    return (float)$price * (float)$rate;
+                }
 
-            throw new LocalizedException(
-                __(
-                    'Undefined rate from "%1-%2".',
-                    $this->getCode(),
-                    $this->getCurrencyCodeFromToCurrency($toCurrency)
-                )
-            );
+                throw new LocalizedException(
+                    __(
+                        'Undefined rate from "%1-%2".',
+                        $this->getCode(),
+                        $this->getCurrencyCodeFromToCurrency($toCurrency)
+                    )
+                );
+            }
+            else
+            {
+                return parent::convert($price, $toCurrency);
+            }
         }
 
         /**
@@ -169,23 +182,30 @@
          */
         public function formatTxt($price, $options = [])
         {
-            if (!is_numeric($price)) {
-                $price = $this->_localeFormat->getNumber($price);
-            }
-            /**
-             * Fix problem with 12 000 000, 1 200 000
-             *
-             * %f - the argument is treated as a float, and presented as a floating-point number (locale aware).
-             * %F - the argument is treated as a float, and presented as a floating-point number (non-locale aware).
-             */
-            $price = sprintf("%F", $price);
-
-            if ($this->canUseNumberFormatter($options))
+            if($this->getIsActive())
             {
-                return $this->formatCurrency($price, $options);
-            }
+                if (!is_numeric($price)) {
+                    $price = $this->_localeFormat->getNumber($price);
+                }
+                /**
+                 * Fix problem with 12 000 000, 1 200 000
+                 *
+                 * %f - the argument is treated as a float, and presented as a floating-point number (locale aware).
+                 * %F - the argument is treated as a float, and presented as a floating-point number (non-locale aware).
+                 */
+                $price = sprintf("%F", $price);
 
-            return $this->getLocaleCurrency()->getCurrency($this->getCode())->toCurrency($price, $options);
+                if ($this->canUseNumberFormatter($options))
+                {
+                    return $this->formatCurrency($price, $options);
+                }
+
+                return $this->getLocaleCurrency()->getCurrency($this->getCode())->toCurrency($price, $options);
+            }
+            else
+            {
+                return parent::formatTxt($price, $options);
+            }
         }
 
         /**
@@ -401,6 +421,51 @@
         protected function getDataObjectFactory(): DataObjectFactory
         {
             return $this->_dataObjectFactory;
+        }
+
+        /**
+         * Gets wether the currency modification is active or not.
+         *
+         * @access protected
+         *
+         * @return bool
+         */
+        protected function getIsActive(): bool
+        {
+            return $this->getConfig()->getModuleStatus() && $this->getModificationStatus();
+        }
+
+        /**
+         * Gets Modification Status flag
+         *
+         * @access protected
+         *
+         * @return bool
+         */
+        protected function getModificationStatus(): bool
+        {
+            return $this->getConfig()->getFlag(static::CONFIG_PATH_MODIFICATION_STATUS);
+        }
+
+        /**
+         * Hippiemonkeys Config property
+         *
+         * @access private
+         *
+         * @var \Hippiemonkeys\Core\Api\Helper\ConfigInterface $_config
+         */
+        private $_config;
+
+        /**
+         * Gets Hippiemonkeys Config
+         *
+         * @access protected
+         *
+         * @return \Hippiemonkeys\Core\Api\Helper\ConfigInterface
+         */
+        protected function getConfig(): ConfigInterface
+        {
+            return $this->_config;
         }
     }
 ?>

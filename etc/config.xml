@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Thomas Athanasiou at Hippiemonkeys
+    Copyright (c) 2022 Hippiemonkeys (https://hippiemonkeys.com)
+    Hippiemonkeys_ShippingTaxydromikiAdvanced
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <hippiemonkeys_modification>
+            <magentodirectory>
+                <active>1</active>
+                <currency_status>1</currency_status>
+            </magentodirectory>
+        </hippiemonkeys_modification>
+    </default>
+</config>

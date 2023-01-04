@@ -1,4 +1,4 @@
-# Hippiemonkeys Directory
+# Hippiemonkeys - Modification (Magento Directory)
 This module modifies the '**Magento_Directory**' to apply custom behavior and bug fixes.
 
 # Bug fixes

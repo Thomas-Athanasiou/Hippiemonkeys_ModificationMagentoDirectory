@@ -5,8 +5,9 @@
     Hippiemonkeys_Directory
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
-    <module name="Hippiemonkeys_Directory" setup_version="1.0.0">
+    <module name="Hippiemonkeys_ModificationMagentoDirectory" setup_version="1.0.0">
         <sequence>
+            <module name="Hippiemonkeys_Modification" />
             <module name="Magento_Directory" />
         </sequence>
     </module>
