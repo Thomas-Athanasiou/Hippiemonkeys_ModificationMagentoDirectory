@@ -5,7 +5,7 @@
      * @author Thomas Athanasiou {thomas@hippiemonkeys.com}
      * @link https://hippiemonkeys.com
      * @link https://github.com/Thomas-Athanasiou
-     * @copyright Copyright (c) 2022 Hippiemonkeys Web Inteligence EE All Rights Reserved.
+     * @copyright Copyright (c) 2023 Hippiemonkeys Web Inteligence EE All Rights Reserved.
      * @license http://www.gnu.org/licenses/ GNU General Public License, version 3
      * @package Hippiemonkeys_Directory
      */
@@ -21,8 +21,6 @@
     class CurrencyFactory
     extends ParentCurrencyFactory
     {
-        protected const CONFIG_PATH_MODIFICATION_STATUS = 'currency_status';
-
         /**
          * Constructor
          *
@@ -41,11 +39,7 @@
         }
 
         /**
-         * Creates a Currency
-         *
-         * @access public
-         *
-         * @return mixed
+         * {@inheritdoc}
          */
         public function create(array $data = [])
         {
@@ -73,19 +67,7 @@
          */
         protected function getIsActive(): bool
         {
-            return $this->getConfig()->getModuleStatus() && $this->getModificationStatus();
-        }
-
-        /**
-         * Gets Modification Status flag
-         *
-         * @access protected
-         *
-         * @return bool
-         */
-        protected function getModificationStatus(): bool
-        {
-            return $this->getConfig()->getFlag(static::CONFIG_PATH_MODIFICATION_STATUS);
+            return $this->getConfig()->getIsActive();
         }
 
         /**

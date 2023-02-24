@@ -5,7 +5,7 @@
      * @author Thomas Athanasiou {thomas@hippiemonkeys.com}
      * @link https://hippiemonkeys.com
      * @link https://github.com/Thomas-Athanasiou
-     * @copyright Copyright (c) 2022 Hippiemonkeys Web Inteligence EE All Rights Reserved.
+     * @copyright Copyright (c) 2023 Hippiemonkeys Web Inteligence EE All Rights Reserved.
      * @license http://www.gnu.org/licenses/ GNU General Public License, version 3
      * @package Hippiemonkeys_ModificationMagentoDirectory
      */
@@ -14,13 +14,11 @@
 
     use Magento\Framework\App\ObjectManager,
         Magento\Framework\Exception\InputException,
-        Magento\Directory\Model\Currency\Filter,
         Magento\Framework\Locale\Currency as LocaleCurrency,
         Magento\Framework\Locale\ResolverInterface as LocaleResolverInterface,
         Magento\Framework\NumberFormatterFactory,
         Magento\Framework\Serialize\Serializer\Json as Serializer,
         Magento\Framework\Exception\LocalizedException,
-        Magento\Framework\Model\AbstractModel,
         Magento\Directory\Model\Currency as ParentCurrency,
         Magento\Directory\Model\CurrencyConfig,
         Magento\Framework\Model\Context,
@@ -38,17 +36,10 @@
 
     /**
      * Currency model
-     *
-     * @api
-     *
-     * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
-     * @since 100.0.2
      */
     class Currency
     extends ParentCurrency
     {
-        protected const CONFIG_PATH_MODIFICATION_STATUS = 'currency_status';
-
         /**
          * Number Formatter property
          *
@@ -386,7 +377,7 @@
          *
          * @access private
          *
-         * @var \Magento\Framework\Serialize\Serializer $_serializer
+         * @var \Magento\Framework\Serialize\Serializer\Json $_serializer
          */
         private $_serializer;
 
@@ -395,7 +386,7 @@
          *
          * @access protected
          *
-         * @return \Magento\Framework\Serialize\Serializer
+         * @return \Magento\Framework\Serialize\Serializer\Json
          */
         protected function getSerializer(): Serializer
         {
@@ -432,19 +423,7 @@
          */
         protected function getIsActive(): bool
         {
-            return $this->getConfig()->getModuleStatus() && $this->getModificationStatus();
-        }
-
-        /**
-         * Gets Modification Status flag
-         *
-         * @access protected
-         *
-         * @return bool
-         */
-        protected function getModificationStatus(): bool
-        {
-            return $this->getConfig()->getFlag(static::CONFIG_PATH_MODIFICATION_STATUS);
+            return $this->getConfig()->getIsActive();
         }
 
         /**
